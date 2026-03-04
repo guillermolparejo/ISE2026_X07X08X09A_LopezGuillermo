@@ -23,10 +23,11 @@ void ThLED (void *argument) {
   
   while (1) {
    osThreadFlagsWait(0x01,osFlagsWaitAny,osWaitForever);
-    for(int i = 0; i++;i<5){
+    for(int i = 0; i < 25; i++){
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
       osDelay(100);
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+			osDelay(100);
     }
     
     osThreadYield();                            // suspend thread

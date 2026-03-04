@@ -183,7 +183,7 @@ extern osThreadId_t tid_ThLED;  ;
 extern void RTC_SetAlarm(void);
 
 void RTC_Alarm_IRQHandler(void){
-  HAL_RTC_AlarmAEventCallback(&RtcHandle);
+  HAL_RTC_AlarmIRQHandler(&RtcHandle);
 }
 
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc){
