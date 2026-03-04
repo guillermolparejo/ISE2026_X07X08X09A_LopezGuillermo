@@ -178,18 +178,6 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
 
-extern RTC_HandleTypeDef RtcHandle;
-extern osThreadId_t tid_ThLED;  ;
-extern void RTC_SetAlarm(void);
-
-void RTC_Alarm_IRQHandler(void){
-  HAL_RTC_AlarmIRQHandler(&RtcHandle);
-}
-
-void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc){
-  osThreadFlagsSet(tid_ThLED,0x01);
-  RTC_SetAlarm();
-}
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None

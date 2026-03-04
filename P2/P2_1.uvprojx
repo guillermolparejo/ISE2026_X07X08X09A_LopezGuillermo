@@ -389,11 +389,6 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>RTC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\RTC.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\stm32f4xx_it.c</FilePath>
@@ -402,6 +397,11 @@
               <FileName>ThLeds.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\ThLeds.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThRTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ThRTC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -427,6 +427,21 @@
               <FileName>ThLCD.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\ThLCD.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RTC</GroupName>
+          <Files>
+            <File>
+              <FileName>RTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RTC.c</FilePath>
+            </File>
+            <File>
+              <FileName>RTC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\RTC.h</FilePath>
             </File>
           </Files>
         </Group>
