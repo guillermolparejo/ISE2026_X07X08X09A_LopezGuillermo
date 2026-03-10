@@ -28,44 +28,68 @@ void ThSNTP (void *argument) {
     osDelay(5000); // Espera inicial de 5s tras el arranque
   while (1) {
 
-    // Realiza la petición SNTP (usa el puerto 123 por defecto)
+    netSNTPc_GetTime(NULL, sntp_client_cb);
 
-    netSNTPc_GetTime (NULL, sntp_client_cb);
-
-    // Espera 3 minutos (3 * 60 * 1000 ms)
-
-    osDelay(1800000); 
+    osDelay(180000); 
   }
  }
 
 void sntp_client_cb (uint32_t seconds, uint32_t seconds_fraction) {
 
 
-	time_t unix_time = (time_t)(seconds-2208988800U);
+    struct tm ts;
 
-    // 2. Ajustar Zona Horaria (Ejemplo: UTC-5)
-    unix_time -= (5 * 3600); 
-
-    // 3. Convertir a estructura humana usando la librería estándar
-    struct tm *ts;
-    ts = gmtime(&unix_time); // gmtime es más seguro en embebidos que localtime
-
-    // 4. Configurar el hardware del RTC
+    ts = *localtime(&seconds);
+		
     RTC_TimeTypeDef sTime = {0};
     RTC_DateTypeDef sDate = {0};
 
-    sTime.Hours = ts->tm_hour;
-    sTime.Minutes = ts->tm_min;
-    sTime.Seconds = ts->tm_sec;
+    sTime.Hours = ts.tm_hour + 1;
+    sTime.Minutes = ts.tm_min;
+    sTime.Seconds = ts.tm_sec;
     sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
     sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-    HAL_RTC_SetTime(&RtcHandle, &sTime, RTC_FORMAT_BIN);
-
-    sDate.WeekDay = (ts->tm_wday == 0) ? RTC_WEEKDAY_SUNDAY : ts->tm_wday;
-    sDate.Month = ts->tm_mon + 1; // tm_mon es 0-11, RTC espera 1-12
-    sDate.Date = ts->tm_mday;
-    sDate.Year = (ts->tm_year + 1900) - 2000; // tm_year son años desde 1900
-    HAL_RTC_SetDate(&RtcHandle, &sDate, RTC_FORMAT_BIN);
+		
+    if (HAL_RTC_SetTime(&RtcHandle, &sTime, RTC_FORMAT_BIN) != HAL_OK) {
+        return;  
+    }
+    sDate.WeekDay = ts.tm_wday;
+    sDate.Month = ts.tm_mon + 1;      
+    sDate.Date = ts.tm_mday;
+    sDate.Year = ts.tm_year - 100;
+		
+    if (HAL_RTC_SetDate(&RtcHandle, &sDate, RTC_FORMAT_BIN) != HAL_OK) {
+        return;  // Error al configurar fecha
+    }
 		osThreadFlagsSet(TID_Led,0x02);
 }
 
+void EXTI15_10_IRQHandler(void){
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+  RTC_DateTypeDef sdatestructure;
+  RTC_TimeTypeDef stimestructure;
+
+  /*##-1- Configure the Date #################################################*/
+  /* Set Date: Tuesday February 18th 2014 */
+  sdatestructure.Year = 0x00;
+  sdatestructure.Month = RTC_MONTH_JANUARY;
+  sdatestructure.Date = 0x1;
+  sdatestructure.WeekDay = RTC_WEEKDAY_TUESDAY;
+  
+
+  /*##-2- Configure the Time #################################################*/
+  /* Set Time: 02:00:00 */
+  stimestructure.Hours = 0x00;
+  stimestructure.Minutes = 0x00;
+  stimestructure.Seconds = 0x00;
+  stimestructure.TimeFormat = RTC_HOURFORMAT12_AM;
+  stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ;
+  stimestructure.StoreOperation = RTC_STOREOPERATION_RESET;
+
+	
+	HAL_RTC_SetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BCD);
+  HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD);
+}

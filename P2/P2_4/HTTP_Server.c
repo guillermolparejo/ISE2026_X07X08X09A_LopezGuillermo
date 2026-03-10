@@ -204,8 +204,8 @@ __NO_RETURN void app_main (void *arg) {
   LED_Initialize();
 	ADC_Initialize();
 	RTC_Init();
+	netInitialize ();
 	Init_ThSNTP();
-  netInitialize ();
 
   TID_Display = osThreadNew (Display,  NULL, NULL);
   TID_Led     = osThreadNew (BlinkLed, NULL, NULL);
@@ -223,7 +223,10 @@ __NO_RETURN void app_main (void *arg) {
 void LED_Initialize(){
 	
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-  
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+	
+	
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -236,6 +239,14 @@ void LED_Initialize(){
   
   GPIO_InitStruct.Pin = GPIO_PIN_14;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	
+	//Pulsador Azul
+	
+	GPIO_InitStruct.Pin= GPIO_PIN_13;
+  GPIO_InitStruct.Mode= GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull= GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 void ADC_Initialize(){
