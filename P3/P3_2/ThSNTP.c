@@ -9,7 +9,7 @@ extern osThreadId_t TID_Led;
 osThreadId_t tid_ThSNTP;                        // thread id
 
 void ThSNTP (void *argument);                   // thread function
-
+extern uint8_t g_woke_by_button;
 void sntp_client_cb (uint32_t seconds, uint32_t seconds_fraction);
 const NET_ADDR ntp_server = {NET_ADDR_IP4,0,216,239,35,0};
 int Init_ThSNTP (void) {
@@ -69,7 +69,9 @@ void EXTI15_10_IRQHandler(void){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-  RTC_DateTypeDef sdatestructure;
+	if(GPIO_Pin == GPIO_PIN_13){
+	g_woke_by_button=1;
+	RTC_DateTypeDef sdatestructure;
   RTC_TimeTypeDef stimestructure;
 
   sdatestructure.Year = 0x00;
@@ -87,4 +89,5 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
   HAL_RTC_SetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BCD);
   HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD);
+	}
 }
